@@ -34,42 +34,64 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tab1 = this.Factory.CreateRibbonTab();
+            this.A = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.ShowAllButton = this.Factory.CreateRibbonButton();
-            this.tab1.SuspendLayout();
+            this.DateTimePicker = this.Factory.CreateRibbonButton();
+            this.Allin = this.Factory.CreateRibbonButton();
+            this.Show_All = this.Factory.CreateRibbonButton();
+            this.GetProjectID = this.Factory.CreateRibbonEditBox();
+            this.A.SuspendLayout();
             this.group1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tab1
+            // A
             // 
-            this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
-            this.tab1.Groups.Add(this.group1);
-            this.tab1.Label = "TabAddIns";
-            this.tab1.Name = "tab1";
+            this.A.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
+            this.A.Groups.Add(this.group1);
+            this.A.Label = "TabAddIns";
+            this.A.Name = "A";
             // 
             // group1
             // 
-            this.group1.Items.Add(this.ShowAllButton);
+            this.group1.Items.Add(this.DateTimePicker);
+            this.group1.Items.Add(this.Allin);
+            this.group1.Items.Add(this.Show_All);
+            this.group1.Items.Add(this.GetProjectID);
             this.group1.Label = "group1";
             this.group1.Name = "group1";
             // 
-            // ShowAllButton
+            // DateTimePicker
             // 
-            this.ShowAllButton.Label = "Show All";
-            this.ShowAllButton.Name = "ShowAllButton";
-            this.ShowAllButton.ScreenTip = "Press to show all data from DB";
-            this.ShowAllButton.SuperTip = "Copies all Tasks to Project";
-            this.ShowAllButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ShowAllButton_Click);
+            this.DateTimePicker.Label = "Выберите Дату:";
+            this.DateTimePicker.Name = "DateTimePicker";
+            this.DateTimePicker.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.DateTimePicker_Click);
+            // 
+            // Allin
+            // 
+            this.Allin.Label = "Архивировать";
+            this.Allin.Name = "Allin";
+            this.Allin.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Allin_Click);
+            // 
+            // Show_All
+            // 
+            this.Show_All.Label = "Разархивировать";
+            this.Show_All.Name = "Show_All";
+            this.Show_All.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Show_All_Click);
+            // 
+            // GetProjectID
+            // 
+            this.GetProjectID.Label = "Введите ID проекта";
+            this.GetProjectID.Name = "GetProjectID";
+            this.GetProjectID.TextChanged += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.editBox1_TextChanged);
             // 
             // ShowAll
             // 
             this.Name = "ShowAll";
             this.RibbonType = "Microsoft.Project.Project";
-            this.Tabs.Add(this.tab1);
+            this.Tabs.Add(this.A);
             this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.ShowAll_Load);
-            this.tab1.ResumeLayout(false);
-            this.tab1.PerformLayout();
+            this.A.ResumeLayout(false);
+            this.A.PerformLayout();
             this.group1.ResumeLayout(false);
             this.group1.PerformLayout();
             this.ResumeLayout(false);
@@ -78,9 +100,12 @@
 
         #endregion
 
-        internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonTab A;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton ShowAllButton;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton DateTimePicker;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Allin;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton Show_All;
+        internal Microsoft.Office.Tools.Ribbon.RibbonEditBox GetProjectID;
     }
 
     partial class ThisRibbonCollection

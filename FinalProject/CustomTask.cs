@@ -8,11 +8,12 @@ namespace FinalProject
 {
     internal class CustomTask
     {
-        internal string Name { get; set; }
-        internal string Duration { get; set; }
-        internal DateTime Start { get; set; }
-        internal DateTime Finish { get;set; }
-        internal int Predecessors { get; set; }
-        internal int SubTasks { get; set; }
+        string Name { get; set; }
+        string Duration { get; set; }
+        DateTime Start { get; set; }
+        DateTime Finish { get; set; }
+        string Predecessors { get; set; }
+        int OutlineLevel { get;set; }
+        
     }
 }
