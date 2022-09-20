@@ -181,49 +181,66 @@ namespace FinalProject
             {
                 con.Open();
                 string projectId = GetProjectID.Text;
-                string queryRes = $"SELECT DISTINCT ArchieveResources.Name, ArchieveResources.Type, ArchieveResources.Initials, ArchieveResources.Max_Units, ArchieveAssignments.Project_Id FROM ArchieveAssignments INNER JOIN ArchieveResources ON ArchieveAssignments.Resource_Id = ArchieveResources.GUID WHERE(ArchieveAssignments.Project_Id LIKE '{projectId}')";
-                SqlCommand cmd = new SqlCommand(queryRes, con);
-                SqlDataReader readerRes = cmd.ExecuteReader();
-                while (readerRes.Read())
-                {
-                    Microsoft.Office.Interop.MSProject.Resource newRes = pj.Resources.Add(readerRes.GetString(0));
-                    newRes.Type = Microsoft.Office.Interop.MSProject.PjResourceTypes.pjResourceTypeWork;//TODO: сделать проверку типа в таблице и вставить нужный тип
-                    newRes.MaxUnits = Convert.ToInt32(readerRes.GetString(3));
-                    newRes.Initials = readerRes.GetString(2);
-                }
-                readerRes.Close();
-                cmd.Cancel();
-                string query = "SELECT * FROM dbo.ArchieveTasks";
-                SqlCommand command= new SqlCommand(query,con);
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    Microsoft.Office.Interop.MSProject.Task newTask=pj.Tasks.Add(reader.GetString(2));
-                    int durationInt = Convert.ToInt32(reader.GetString(3))/480;
-                    string durationString = durationInt.ToString() + "dys";
-                    newTask.Duration=durationString;
-                    DateTime start = DateTime.Parse(reader.GetString(4));
-                    newTask.Start= start;
-                    DateTime finish = DateTime.Parse(reader.GetString(5));
-                    newTask.Start = finish;
-                    newTask.Predecessors=reader.GetString(6);
-                    newTask.OutlineLevel = (short)reader.GetInt32(7);
-                   
-
-
-                    string query1 = $"SELECT ArchieveResources.Name, ArchieveAssignments.Task_Id FROM ArchieveAssignments INNER JOIN ArchieveTasks ON ArchieveAssignments.Task_Id = ArchieveTasks.GUID INNER JOIN ArchieveResources ON ArchieveAssignments.Resource_Id = ArchieveResources.GUID WHERE(ArchieveAssignments.Task_Id LIKE '{reader.GetGuid(1).ToString()}')";
-                    SqlCommand command1= new SqlCommand(query1, con);
-                    SqlDataReader reader1 = command1.ExecuteReader();
-                    StringBuilder thisResources = new StringBuilder();
-                    while (reader1.Read())
-                    {
-                        thisResources.Append($"{reader1.GetString(0)};");
-                    }
-                    newTask.ResourceNames=thisResources.ToString();
-                    
-                }
-                reader.Close();
+                GetResourcesFromDatabase();
+                GetTasksAndResourcesFromDatabase();
                 con.Close();
+
+
+                void GetResourcesFromDatabase()
+                {
+                    string queryRes = $"SELECT DISTINCT ArchieveResources.Name, ArchieveResources.Type, " +
+                        $"ArchieveResources.Initials, ArchieveResources.Max_Units, ArchieveAssignments.Project_Id " +
+                        $"FROM ArchieveAssignments INNER JOIN ArchieveResources ON ArchieveAssignments.Resource_Id " +
+                        $"= ArchieveResources.GUID WHERE(ArchieveAssignments.Project_Id LIKE '{projectId}')";
+                    SqlCommand cmdRes = new SqlCommand(queryRes, con);
+                    SqlDataReader readerRes = cmdRes.ExecuteReader();
+                    while (readerRes.Read())
+                    {
+                        Microsoft.Office.Interop.MSProject.Resource newRes = pj.Resources.Add(readerRes.GetString(0));
+                        newRes.Type = Microsoft.Office.Interop.MSProject.PjResourceTypes.pjResourceTypeWork;//TODO: сделать проверку типа в таблице и вставить нужный тип
+                        newRes.MaxUnits = Convert.ToInt32(readerRes.GetString(3));
+                        newRes.Initials = readerRes.GetString(2);
+                    }
+                    readerRes.Close();
+                    cmdRes.Cancel();
+                }
+
+                void GetTasksAndResourcesFromDatabase()
+                {
+                    string query = $"SELECT DISTINCT ArchieveTasks.*, ArchieveAssignments.Project_Id " +
+                        $"FROM ArchieveAssignments INNER JOIN ArchieveTasks ON ArchieveAssignments.Task_Id " +
+                        $"= ArchieveTasks.GUID WHERE(ArchieveAssignments.Project_Id LIKE '{projectId}')";
+                    SqlCommand command = new SqlCommand(query, con);
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        Microsoft.Office.Interop.MSProject.Task newTask = pj.Tasks.Add(reader.GetString(2));
+                        int durationInt = Convert.ToInt32(reader.GetString(3)) / 480;
+                        string durationString = durationInt.ToString() + "dys";
+                        newTask.Duration = durationString;
+                        DateTime start = DateTime.Parse(reader.GetString(4));
+                        newTask.Start = start;
+                        DateTime finish = DateTime.Parse(reader.GetString(5));
+                        newTask.Start = finish;
+                        newTask.Predecessors = reader.GetString(6);
+                        newTask.OutlineLevel = (short)reader.GetInt32(7);
+                        // Здесь добавляем к каждой задаче приписанные ей ресурсы
+                        string queryTaskRes = $"SELECT ArchieveResources.Initials, ArchieveAssignments.Task_Id " +
+                        $"FROM ArchieveAssignments INNER JOIN ArchieveTasks ON ArchieveAssignments.Task_Id " +
+                        $"= ArchieveTasks.GUID INNER JOIN ArchieveResources ON ArchieveAssignments.Resource_Id " +
+                        $"= ArchieveResources.GUID WHERE(ArchieveAssignments.Task_Id LIKE '{reader.GetGuid(1)}')";
+                        SqlCommand cmdTaskRes = new SqlCommand(queryTaskRes, con);
+                        SqlDataReader readerTaskRes = cmdTaskRes.ExecuteReader();
+                        StringBuilder thisResources = new StringBuilder();
+                        while (readerTaskRes.Read())
+                        {
+                            thisResources.Append($"{readerTaskRes.GetString(0)};");
+                        }
+                        newTask.ResourceInitials= thisResources.ToString();
+                    }
+                    reader.Close();
+                    command.Cancel();
+                }
             }
         }
 
